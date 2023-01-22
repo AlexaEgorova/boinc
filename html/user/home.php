@@ -49,6 +49,8 @@ if ($init) {
     page_head(tra("Your account"));
 }
 
+echo "<p>".tra("test")."</p>";
+
 show_account_private($user);
 
 page_tail();
