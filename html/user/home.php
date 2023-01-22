@@ -49,7 +49,9 @@ if ($init) {
     page_head(tra("Your account"));
 }
 
-$user_zpg = "<div class=\"container-fluid\"><img src=\"http://localhost:9192/img/".((string) $user->uid)."/score/".((string)$user->total_credit)."\" class=\"img-fluid\" style=\"width:100%\" border=\"10\"></div><br><br>";
+$img_url  = "http://localhost:9192/img/".((string) $user->id)."/score/".((string)$user->total_credit);
+$fimg     = "<img src=\"".$img_url."\" class=\"img\" style=\"width:100%;\" border=\"10\">";
+$user_zpg = "<div class=\"container-fluid\">".$fimg."</div><br><br>";
 echo $user_zpg;
 
 show_account_private($user);
