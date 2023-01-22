@@ -49,12 +49,30 @@ if ($init) {
     page_head(tra("Your account"));
 }
 
-$img_url  = "http://localhost:9192/img/".((string) $user->id)."/score/".((string)$user->total_credit);
+function url(){
+    if(isset($_SERVER['HTTPS'])){
+        $protocol = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
+    }
+    else{
+        $protocol = 'http';
+    }
+    return $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+}
+
+$usr_url  = getenv("GIMMEFY_URL")."/user/";
+$img_url  = $usr_url.((string) $user->id)."/image/".((string)$user->total_credit);
+$gnd_url  = $usr_url.((string) $user->id)."/gender/";
+
 $fimg     = "<img src=\"".$img_url."\" class=\"img\" style=\"width:100%;\" border=\"10\">";
-$user_zpg = "<div class=\"container-fluid\">".$fimg."</div><br><br>";
+
+$fact     = $gnd_url."?callback=".urlencode(url());
+$fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Change avatar gender")."</button>";
+$fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
+$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform."</div><br><br>";
 echo $user_zpg;
 
 show_account_private($user);
+
 
 page_tail();
 
