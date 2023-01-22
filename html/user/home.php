@@ -49,7 +49,8 @@ if ($init) {
     page_head(tra("Your account"));
 }
 
-echo "<p>".tra("test")."</p>";
+$user_zpg = "<div class=\"container-fluid\"><img src=\"http://localhost:9192/img/".((string) $user->email)."/score/".((string)$user->total_credit)."\" class=\"img-fluid\" style=\"width:100%\" border=\"10\"></div><br><br>";
+echo $user_zpg;
 
 show_account_private($user);
 
