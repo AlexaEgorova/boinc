@@ -62,14 +62,24 @@ function url(){
 $usr_url  = getenv("GIMMEFY_URL")."/user/";
 $img_url  = $usr_url.((string) $user->id)."/image/".((string)$user->total_credit);
 $gnd_url  = $usr_url.((string) $user->id)."/gender/";
+$tip_url  = $usr_url.((string) $user->id)."/tip/".((string)$user->total_credit);
+
+$resp = file_get_contents($tip_url);
+
+$key = "text";
+$resp = json_decode($resp);
+$tip = $resp->$key;
+$tip_crd = "<div class=\"card\"><div class=\"card-body\">".$tip."</div></div>";
 
 $fimg     = "<img src=\"".$img_url."\" class=\"img\" style=\"width:100%;\" border=\"10\">";
 
 $fact     = $gnd_url."?callback=".urlencode(url());
 $fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Change avatar gender")."</button>";
 $fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
-$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform."</div><br><br>";
+$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform.$tip_crd."</div><br><br>";
 echo $user_zpg;
+
+
 
 show_account_private($user);
 
