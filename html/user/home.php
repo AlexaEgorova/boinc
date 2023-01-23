@@ -17,9 +17,11 @@
 // along with BOINC.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once("../inc/util.inc");
-require_once("../inc/user.inc");
 require_once("../inc/boinc_db.inc");
+require_once("../inc/user.inc");
 require_once("../inc/forum.inc");
+require_once("../inc/host.inc");
+require_once("../inc/credit.inc");
 
 check_get_args(array());
 
@@ -59,10 +61,16 @@ function url(){
     return $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 }
 
+$expavg   = "expavg_score=".((string) $user->expavg_credit);
+$created  = "registration_time=".((string) $user->create_time);
+$hosts    = BoincHost::enum("userid=$user->id");
+$n_hosts  = "cpus=".count($hosts);
+$scr_pnt  = $expavg."&".$created."&".$n_hosts;
+
 $usr_url  = getenv("GIMMEFY_URL")."/user/";
-$img_url  = $usr_url.((string) $user->id)."/image/".((string)$user->total_credit);
+$img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
 $gnd_url  = $usr_url.((string) $user->id)."/gender/";
-$tip_url  = $usr_url.((string) $user->id)."/tip/".((string)$user->total_credit);
+$tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
 
 $resp = file_get_contents($tip_url);
 
@@ -78,8 +86,6 @@ $fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Sub
 $fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
 $user_zpg = "<div class=\"container-fluid\">".$fimg.$fform.$tip_crd."</div><br><br>";
 echo $user_zpg;
-
-
 
 show_account_private($user);
 
