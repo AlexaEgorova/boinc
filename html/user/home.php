@@ -72,10 +72,10 @@ $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
 $gnd_url  = $usr_url.((string) $user->id)."/gender/";
 $tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
 
-$resp = file_get_contents($tip_url);
+$resp = @file_get_contents($tip_url);
 
 $key = "text";
-$resp = json_decode($resp);
+$resp = @json_decode($resp);
 $tip = $resp->$key;
 $tip_crd = "<div class=\"card\"><div class=\"card-body\">".$tip."</div></div>";
 
@@ -88,7 +88,6 @@ $user_zpg = "<div class=\"container-fluid\">".$fimg.$fform.$tip_crd."</div><br><
 echo $user_zpg;
 
 show_account_private($user);
-
 
 page_tail();
 
