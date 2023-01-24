@@ -61,21 +61,37 @@ function url(){
     return $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 }
 
+$total   = "total_score=".((string) $user->total_credit);
 $expavg   = "expavg_score=".((string) $user->expavg_credit);
 $created  = "registration_time=".((string) $user->create_time);
 $hosts    = BoincHost::enum("userid=$user->id");
 $n_hosts  = "cpus=".count($hosts);
-$scr_pnt  = $expavg."&".$created."&".$n_hosts;
+$scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total;
 
 $usr_url  = getenv("GIMMEFY_URL")."/user/";
 $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
 $gnd_url  = $usr_url.((string) $user->id)."/gender/";
 $tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
+$lvl_url  = $usr_url.((string) $user->id)."/level?".$scr_pnt;
 
-$resp = @file_get_contents($tip_url);
+
+$resp = file_get_contents($lvl_url);
+
+$resp = json_decode($resp);
+
+$key = "level";
+$level = $resp->$key;
+$key = "level_name";
+$level_name = $resp->$key;
+$key = "year";
+$year = $resp->$key;
+
+// -----------
+
+$resp = file_get_contents($tip_url);
 
 $key = "text";
-$resp = @json_decode($resp);
+$resp = json_decode($resp);
 $tip = $resp->$key;
 $tip_crd = "<div class=\"card\"><div class=\"card-body\">".$tip."</div></div>";
 
@@ -84,10 +100,17 @@ $fimg     = "<img src=\"".$img_url."\" class=\"img\" style=\"width:100%;\" borde
 $fact     = $gnd_url."?callback=".urlencode(url());
 $fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Change avatar gender")."</button>";
 $fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
-$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform.$tip_crd."</div><br><br>";
+$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform;
 echo $user_zpg;
 
+row2("<b>Уровень:</b>", (string) $level);
+echo "<br>";
+row2("<b>Звание:</b>", $level_name);
+
+echo "<br>".$tip_crd."</div><br><br>";
+
 show_account_private($user);
+
 
 page_tail();
 
