@@ -85,6 +85,16 @@ $key = "level_name";
 $level_name = $resp->$key;
 $key = "year";
 $year = $resp->$key;
+$key = "total_exp";
+$total_exp = (int) $resp->$key;
+$key = "year";
+$year = $resp->$key;
+if ($year === "") {
+    $year = "";
+} else {
+    $year = " (".$year.")";
+}
+
 
 // -----------
 
@@ -103,9 +113,9 @@ $fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</
 $user_zpg = "<div class=\"container-fluid\">".$fimg.$fform;
 echo $user_zpg;
 
-row2("<b>Уровень:</b>", (string) $level);
+row2("<b>Уровень:</b>", ((string) $level)." (".((string) ($total_exp))." pts)");
 echo "<br>";
-row2("<b>Звание:</b>", $level_name);
+row2("<b>Звание:</b>", $level_name.$year);
 
 echo "<br>".$tip_crd."</div><br><br>";
 
