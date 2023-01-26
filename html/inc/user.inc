@@ -280,7 +280,7 @@ function show_user_info_private($user) {
             tra("Account keys"),
             "<a href=\"weak_auth.php\">".tra("View")."</a>"
         );
-        
+
         require_once("../inc/account_ownership.inc");
         if (file_exists($account_ownership_private_key_file_path)) {
           // If the server has keys configured show the account ownership form
@@ -542,6 +542,76 @@ function show_profile_link($user) {
     }
 }
 
+function url(){
+    if(isset($_SERVER['HTTPS'])){
+        $protocol = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
+    }
+    else{
+        $protocol = 'http';
+    }
+    return $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+}
+
+
+function row11($x, $y) {
+    echo "<tr><th colspan=2><div class=\"card\"><div class=\"card-body\">$x</div><div class=\"card-footer\" style=\"font-weight:100;\">".$y."</div></div></th></tr>\n";
+}
+
+function show_gimmefy($user) {
+    $total   = "total_score=".((string) $user->total_credit);
+    $expavg   = "expavg_score=".((string) $user->expavg_credit);
+    $created  = "registration_time=".((string) $user->create_time);
+    $hosts    = BoincHost::enum("userid=$user->id");
+    $n_hosts  = "cpus=".count($hosts);
+    $scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total;
+
+    $usr_url  = getenv("GIMMEFY_URL")."/user/";
+    $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
+    $gnd_url  = $usr_url.((string) $user->id)."/gender/";
+    $tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
+    $lvl_url  = $usr_url.((string) $user->id)."/level?".$scr_pnt;
+    $resp = file_get_contents($lvl_url);
+
+    $resp = json_decode($resp);
+
+    $key = "level";
+    $level = $resp->$key;
+    $key = "level_name";
+    $level_name = $resp->$key;
+    $key = "year";
+    $year = $resp->$key;
+    $key = "total_exp";
+    $total_exp = (int) $resp->$key;
+    $key = "year";
+    $year = $resp->$key;
+    $key = "gender";
+    $gender = $resp->$key;
+    if ($year === "") {
+        $year = "";
+    } else {
+        $year = " (".$year.")";
+    }
+
+    $resp = file_get_contents($tip_url);
+
+    $fact = $gnd_url."?callback=".urlencode(url());
+    $fbtn = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Сменить")."</button>";
+    $fform = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
+
+    $fkek = "<a href=\"".$fact."\">Сменить</a>";
+
+    $key = "text";
+    $resp = json_decode($resp);
+    $tip = $resp->$key;
+    $img = "<div><img src=\"".$img_url."\" class=\"img\" onclick='return confirm(\"Я gimmefy-server\")' style=\"width:100%\" border=\"10\">"."</div>";
+    row1("Персонаж");
+    row11($img, $tip);
+    // row11($tip);
+    row2("Пол", $gender." (".$fkek.")");
+    row2("Уровень", ((string) $level)." (".((string) ($total_exp))." pts)");
+    row2("Звание", $level_name.$year);
+}
+
 function show_account_private($user) {
     grid(
         false,
@@ -555,6 +625,7 @@ function show_account_private($user) {
             if (function_exists('show_user_donations_private')) {
                 show_user_donations_private($user);
             }
+
             end_table();
             if (!NO_COMPUTING) {
                 show_other_projects($user, true);
@@ -565,6 +636,7 @@ function show_account_private($user) {
         },
         function() use ($user) {
             start_table();
+            show_gimmefy($user);
             row1(tra("Community"));
             show_community_private($user);
             end_table();

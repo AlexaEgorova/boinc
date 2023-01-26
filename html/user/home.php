@@ -51,73 +51,65 @@ if ($init) {
     page_head(tra("Your account"));
 }
 
-function url(){
-    if(isset($_SERVER['HTTPS'])){
-        $protocol = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
-    }
-    else{
-        $protocol = 'http';
-    }
-    return $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-}
-
-$total   = "total_score=".((string) $user->total_credit);
-$expavg   = "expavg_score=".((string) $user->expavg_credit);
-$created  = "registration_time=".((string) $user->create_time);
-$hosts    = BoincHost::enum("userid=$user->id");
-$n_hosts  = "cpus=".count($hosts);
-$scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total;
-
-$usr_url  = getenv("GIMMEFY_URL")."/user/";
-$img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
-$gnd_url  = $usr_url.((string) $user->id)."/gender/";
-$tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
-$lvl_url  = $usr_url.((string) $user->id)."/level?".$scr_pnt;
 
 
-$resp = file_get_contents($lvl_url);
+// $total   = "total_score=".((string) $user->total_credit);
+// $expavg   = "expavg_score=".((string) $user->expavg_credit);
+// $created  = "registration_time=".((string) $user->create_time);
+// $hosts    = BoincHost::enum("userid=$user->id");
+// $n_hosts  = "cpus=".count($hosts);
+// $scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total;
 
-$resp = json_decode($resp);
-
-$key = "level";
-$level = $resp->$key;
-$key = "level_name";
-$level_name = $resp->$key;
-$key = "year";
-$year = $resp->$key;
-$key = "total_exp";
-$total_exp = (int) $resp->$key;
-$key = "year";
-$year = $resp->$key;
-if ($year === "") {
-    $year = "";
-} else {
-    $year = " (".$year.")";
-}
+// $usr_url  = getenv("GIMMEFY_URL")."/user/";
+// $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
+// $gnd_url  = $usr_url.((string) $user->id)."/gender/";
+// $tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
+// $lvl_url  = $usr_url.((string) $user->id)."/level?".$scr_pnt;
 
 
-// -----------
+// $resp = file_get_contents($lvl_url);
 
-$resp = file_get_contents($tip_url);
+// $resp = json_decode($resp);
 
-$key = "text";
-$resp = json_decode($resp);
-$tip = $resp->$key;
-$tip_crd = "<div class=\"card\"><div class=\"card-body\">".$tip."</div></div>";
+// $key = "level";
+// $level = $resp->$key;
+// $key = "level_name";
+// $level_name = $resp->$key;
+// $key = "year";
+// $year = $resp->$key;
+// $key = "total_exp";
+// $total_exp = (int) $resp->$key;
+// $key = "year";
+// $year = $resp->$key;
+// if ($year === "") {
+//     $year = "";
+// } else {
+//     $year = " (".$year.")";
+// }
 
-$fimg     = "<img src=\"".$img_url."\" class=\"img\" style=\"width:100%;\" border=\"10\">";
 
-$fact     = $gnd_url."?callback=".urlencode(url());
-$fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Change avatar gender")."</button>";
-$fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
-$user_zpg = "<div class=\"container-fluid\">".$fimg.$fform;
-echo $user_zpg;
+// // -----------
 
-row2("<b>Уровень:</b>", ((string) $level)." (".((string) ($total_exp))." pts)");
-echo "<br>";
-row2("<b>Звание:</b>", $level_name.$year);
+// $resp = file_get_contents($tip_url);
 
-echo "<br>".$tip_crd."</div><br><br>";
+// $key = "text";
+// $resp = json_decode($resp);
+// $tip = $resp->$key;
+// $tip_crd = "<div class=\"card\"><div class=\"card-body\">".$tip."</div></div>";
+
+// $fimg     = "<img src=\"".$img_url."\" class=\"img\" onclick='return confirm(\"Я gimmefy-server\")' style=\"width:100%;\" border=\"10\">";
+
+// $fact     = $gnd_url."?callback=".urlencode(url());
+// $fbtn     = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Change avatar gender")."</button>";
+// $fform    = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
+// $user_zpg = "<div class=\"container-fluid\">".$fimg.$fform;
+// echo $user_zpg;
+
+// row2("<b>Уровень:</b>", ((string) $level)." (".((string) ($total_exp))." pts)");
+// echo "<br>";
+// row2("<b>Звание:</b>", $level_name.$year);
+
+// echo "<br>".$tip_crd."</div><br><br>";
 
 show_account_private($user);
 
