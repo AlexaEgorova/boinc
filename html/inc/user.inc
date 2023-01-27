@@ -563,7 +563,15 @@ function show_gimmefy($user) {
     $created  = "registration_time=".((string) $user->create_time);
     $hosts    = BoincHost::enum("userid=$user->id");
     $n_hosts  = "cpus=".count($hosts);
-    $scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total;
+    $has_android = 0;
+    for ($i=0; $i < count($hosts); $i++) {
+        if ($hosts[$i]->os_name === "Android") {
+            $has_android = 1;
+            break;
+        }
+    }
+    $android = "has_android=".((string)$has_android);
+    $scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total."&".$android;
 
     $usr_url  = getenv("GIMMEFY_URL")."/user/";
     $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
@@ -582,6 +590,12 @@ function show_gimmefy($user) {
     $year = $resp->$key;
     $key = "total_exp";
     $total_exp = (int) $resp->$key;
+    $key = "until_next_level";
+    $until_next_level = (int) $resp->$key;
+    $key = "next_item";
+    $next_item = $resp->$key;
+    $key = "until_next_item";
+    $until_next_item = (int) $resp->$key;
     $key = "year";
     $year = $resp->$key;
     $key = "gender";
@@ -608,7 +622,11 @@ function show_gimmefy($user) {
     row11($img, $tip);
     // row11($tip);
     row2("Пол", $gender." (".$fkek.")");
-    row2("Уровень", ((string) $level)." (".((string) ($total_exp))." pts)");
+    row2("Уровень", ((string) $level));
+    row2("Очки", ((string) ($total_exp))." pts");
+    row2("До следующего уровня", ((string) ($until_next_level))." pts");
+    row2("Следующий предмет", $next_item);
+    row2("До следующего предмета", ((string) ($until_next_item))." pts");
     row2("Звание", $level_name.$year);
 }
 
