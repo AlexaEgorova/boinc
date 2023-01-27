@@ -639,13 +639,12 @@ function show_gimmefy($user) {
     row2("Дней подряд", (string) ($current_streak));
     row2("Максимум дней подряд", (string) ($max_streak));
     row2("Пол", $gender." (".$fkek.")");
-    row2("Тема", $theme." (".$fthm.")");
+    if ($has_android) {
+        row2("Тема", $theme." (".$fthm.")");
+    } 
 
     if ($resp->total_hosts >= 2) {
         row2("Вы работаете с нескольких устройств", "+100 pts");
-    }
-    if ($has_android) {
-        row2("Вы используете телефон для работы", "+25 pts");
     }
     if ($max_streak >= 3) {
         row2("Вы заходили в игру больше 3-х дней подряд", "+25 pts");
