@@ -567,19 +567,33 @@ function show_gimmefy($user) {
     for ($i=0; $i < count($hosts); $i++) {
         if ($hosts[$i]->os_name === "Android") {
             $has_android = 1;
-            break;
         }
     }
     $android = "has_android=".((string)$has_android);
-    $scr_pnt  = $expavg."&".$created."&".$n_hosts."&".$total."&".$android;
+    $scr_pnt = $expavg."&".$created."&".$n_hosts."&".$total."&".$android;
 
-    $usr_url  = getenv("GIMMEFY_URL")."/user/";
-    $img_url  = $usr_url.((string) $user->id)."/image?".$scr_pnt;
-    $gnd_url  = $usr_url.((string) $user->id)."/gender/";
-    $tip_url  = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
-    $lvl_url  = $usr_url.((string) $user->id)."/level?".$scr_pnt;
+    $bas_url = getenv("GIMMEFY_URL");
+    $inf_url = $bas_url."/assets/README.html";
+    $usr_url = $bas_url."/user/";
+    $img_url = $usr_url.((string) $user->id)."/image?".$scr_pnt;
+    $gnd_url = $usr_url.((string) $user->id)."/gender";
+    $thm_url = $usr_url.((string) $user->id)."/theme";
+    $tip_url = $usr_url.((string) $user->id)."/tip?".$scr_pnt;
+    $lvl_url = $usr_url.((string) $user->id)."/level?".$scr_pnt;
+
+    $resp = file_get_contents($tip_url);
+
+    $fact = $gnd_url."?callback=".urlencode(url());
+    $fkek = "<a href=\"".$fact."\">Сменить</a>";
+
+    $facc = $thm_url."?callback=".urlencode(url());
+    $fthm = "<a href=\"".$facc."\">Сменить</a>";
+
+    $key = "text";
+    $resp = json_decode($resp);
+    $tip = $resp->$key;
+
     $resp = file_get_contents($lvl_url);
-
     $resp = json_decode($resp);
 
     $key = "level";
@@ -600,34 +614,48 @@ function show_gimmefy($user) {
     $year = $resp->$key;
     $key = "gender";
     $gender = $resp->$key;
+    $key = "theme";
+    $theme = $resp->$key;
+    $key = "current_streak";
+    $current_streak = $resp->$key;
+    $key = "max_streak";
+    $max_streak = $resp->$key;
     if ($year === "") {
         $year = "";
     } else {
         $year = " (".$year.")";
     }
 
-    $resp = file_get_contents($tip_url);
-
-    $fact = $gnd_url."?callback=".urlencode(url());
-    $fbtn = "<button class=\"button\" type=\"submit\" form=\"form1\" value=\"Submit\">".tra("Сменить")."</button>";
-    $fform = "<form action=\"".$fact."\" method=\"post\" id=\"form1\">".$fbtn."</form>";
-
-    $fkek = "<a href=\"".$fact."\">Сменить</a>";
-
-    $key = "text";
-    $resp = json_decode($resp);
-    $tip = $resp->$key;
-    $img = "<div><img src=\"".$img_url."\" class=\"img\" onclick='return confirm(\"Я gimmefy-server\")' style=\"width:100%\" border=\"10\">"."</div>";
+    $img = "<a href=\"".$inf_url."\"><img src=\"".$img_url."\" class=\"img\" style=\"width:100%\" border=\"10\">"."</div>";
     row1("Персонаж");
     row11($img, $tip);
     // row11($tip);
-    row2("Пол", $gender." (".$fkek.")");
     row2("Уровень", ((string) $level));
-    row2("Очки", ((string) ($total_exp))." pts");
+    row2("Звание", $level_name.$year);
+    row2("Опыт", ((string) ($total_exp))." pts");
     row2("До следующего уровня", ((string) ($until_next_level))." pts");
     row2("Следующий предмет", $next_item);
     row2("До следующего предмета", ((string) ($until_next_item))." pts");
-    row2("Звание", $level_name.$year);
+    row2("Дней подряд", (string) ($current_streak));
+    row2("Максимум дней подряд", (string) ($max_streak));
+    row2("Пол", $gender." (".$fkek.")");
+    row2("Тема", $theme." (".$fthm.")");
+
+    if ($resp->total_hosts >= 2) {
+        row2("Вы работаете с нескольких устройств", "+100 pts");
+    }
+    if ($has_android) {
+        row2("Вы используете телефон для работы", "+25 pts");
+    }
+    if ($max_streak >= 3) {
+        row2("Вы заходили в игру больше 3-х дней подряд", "+25 pts");
+    }
+    if ($max_streak >= 7) {
+        row2("Вы заходили в игру больше 7-и дней подряд", "+60 pts");
+    }
+    if ($max_streak >= 14) {
+        row2("Вы заходили в игру больше 14-и дней подряд", "+150 pts");
+    }
 }
 
 function show_account_private($user) {
